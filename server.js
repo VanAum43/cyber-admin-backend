@@ -6,13 +6,16 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-/* ✅ ROOT CHECK ROUTE (Fixes "Cannot GET /") */
+/* ✅ ROOT CHECK ROUTE */
 app.get("/", (req, res) => {
   res.send("Cyber Admin Backend is running ✅");
 });
 
-/* ✅ LOG COLLECTION ROUTE */
+/* ✅ LOG COLLECTION ROUTE (WITH DEBUG) */
 app.post("/log", (req, res) => {
+
+  console.log("🔥 LOG RECEIVED:", req.body); // 👈 DEBUG LINE
+
   const log = {
     ip: req.headers["x-forwarded-for"] || req.socket.remoteAddress,
     userAgent: req.headers["user-agent"],
@@ -41,5 +44,6 @@ app.get("/admin/logs", (req, res) => {
 
 /* 🚨 IMPORTANT FOR RENDER */
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-process.env.PORT
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
