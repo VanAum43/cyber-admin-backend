@@ -1,48 +1,37 @@
 const express = require("express");
 const cors = require("cors");
-const fs = require("fs");
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-/* ✅ ROOT CHECK ROUTE */
+/* 🧠 IN-MEMORY LOG STORE */
+const logs = [];
+
+/* ROOT TEST */
 app.get("/", (req, res) => {
-  res.send("Cyber Admin Backend is running ✅");
+  res.send("Backend alive ✅");
 });
 
-/* ✅ LOG COLLECTION ROUTE (WITH DEBUG) */
+/* LOG ENDPOINT */
 app.post("/log", (req, res) => {
+  console.log("🔥 LOG RECEIVED:", req.body);
 
-  console.log("🔥 LOG RECEIVED:", req.body); // 👈 DEBUG LINE
-
-  const log = {
+  logs.push({
     ip: req.headers["x-forwarded-for"] || req.socket.remoteAddress,
     userAgent: req.headers["user-agent"],
-    action: req.body.action,
-    page: req.body.page,
+    body: req.body,
     time: new Date().toISOString()
-  };
+  });
 
-  fs.appendFileSync("logs.json", JSON.stringify(log) + ",\n");
-  res.json({ status: "logged" });
+  res.json({ status: "logged", total: logs.length });
 });
 
-/* ✅ ADMIN PANEL LOG FETCH */
+/* ADMIN VIEW */
 app.get("/admin/logs", (req, res) => {
-  if (!fs.existsSync("logs.json")) {
-    return res.json([]);
-  }
-
-  const data = fs.readFileSync("logs.json", "utf-8").trim();
-  if (data === "") {
-    return res.json([]);
-  }
-
-  res.json(JSON.parse("[" + data.slice(0, -1) + "]"));
+  res.json(logs);
 });
 
-/* 🚨 IMPORTANT FOR RENDER */
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
