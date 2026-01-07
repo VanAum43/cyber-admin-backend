@@ -36,8 +36,7 @@ app.post("/log", (req, res) => {
 });
 
 /* ✅ ADMIN PANEL FETCH */
-/* GET LOGS FOR ADMIN PANEL */
-app.get("/logs", (req, res) => {
+app.get("/admin/logs", (req, res) => {
   res.json(logs);
 });
 
@@ -47,4 +46,5 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
