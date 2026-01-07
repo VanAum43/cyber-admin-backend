@@ -2,49 +2,32 @@ const express = require("express");
 const cors = require("cors");
 
 const app = express();
-
-/* ✅ ALLOW GITHUB PAGES (IMPORTANT) */
-app.use(cors({
-  origin: "*",   // OK for learning; restrict in production
-  methods: ["GET", "POST"],
-  allowedHeaders: ["Content-Type"]
-}));
-
+app.use(cors({ origin: "*" }));
 app.use(express.json());
 
-/* 🧠 IN-MEMORY LOG STORE (Render-safe) */
+/* In-memory log storage */
 const logs = [];
 
-/* ✅ ROOT TEST */
+/* Test route */
 app.get("/", (req, res) => {
   res.send("Backend alive ✅");
 });
 
-/* ✅ LOG ENDPOINT (CALLED FROM WEBSITE) */
+/* Receive attack logs */
 app.post("/log", (req, res) => {
-  console.log("🔥 LOG RECEIVED:", req.body);
-
   logs.push({
-    ip: req.headers["x-forwarded-for"] || req.socket.remoteAddress,
-    userAgent: req.headers["user-agent"],
-    action: req.body.action || "unknown",
-    page: req.body.page || "unknown",
+    ...req.body,
     time: new Date().toISOString()
   });
-
-  res.json({ status: "logged", total: logs.length });
+  res.json({ success: true });
 });
 
-/* ✅ ADMIN PANEL FETCH */
-app.get("/admin/logs", (req, res) => {
+/* Send logs to admin panel */
+app.get("/logs", (req, res) => {
   res.json(logs);
 });
 
-
-/* ✅ RENDER PORT FIX */
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-
-
